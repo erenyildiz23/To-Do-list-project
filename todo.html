@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>To-Do List</title>
+    <link rel="stylesheet" type="text/css" href="todo.css">
+</head>
+<body>
+  <div id="homeScreen">
+    <div id="userProfile">
+        <img src="images/eren.jpg" alt="User Profile Picture" id="profilePic">
+        <h3 id="userName">Username</h3>
+        <!-- Additional user info can go here -->
+    </div>
+    <div id="taskList">
+        <h3>Today's Tasks</h3>
+        <ul id="tasks">
+            <!-- Tasks will be listed here -->
+        </ul>
+    </div>
+</div>
+    <div id="addTask">
+        <h2>Add Task</h2>
+        <form id="taskForm">
+            <label for="taskName">Task Name:</label>
+            <input type="text" id="taskName" name="taskName"><br>
+
+            <label for="taskDescription">Description:</label>
+            <textarea id="taskDescription" name="taskDescription"></textarea><br>
+
+            <label for="startDate">Start Date:</label>
+            <input type="datetime-local" id="startDate" name="startDate"><br>
+
+            <label for="endDate">End Date:</label>
+            <input type="datetime-local" id="endDate" name="endDate"><br>
+
+            <label for="repeatOptions">Repeat:</label>
+            <select id="repeatOptions" name="repeatOptions">
+                <option value="none">None</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+            </select><br>
+
+            <label for="priority">Priority:</label>
+            <select id="priority" name="priority">
+                <option value="urgent">Urgent</option>
+                <option value="nonurgent">Non-Urgent</option>
+            </select><br>
+
+            <label for="additionalNotes">Additional Notes:</label>
+            <textarea id="additionalNotes" name="additionalNotes"></textarea><br>
+
+            <label for="fileAttachment">Attach File:</label>
+            <input type="file" id="fileAttachment" name="fileAttachment"><br>
+
+            <input type="submit" value="Add Task">
+        </form>
+    </div>
+    
+  
+    <script src="todo.js"></script>
+</body>
+</html>

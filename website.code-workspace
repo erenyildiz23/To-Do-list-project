@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "../website"
+		},
+		{
+			"path": "../JSwebsite"
+		},
+		{
+			"path": "."
+		},
+		{
+			"path": "../../Downloads/yt-js-todo-2022-master"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "To-Do List"
+	}
+}

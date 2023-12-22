@@ -9,6 +9,12 @@ body {
   height: 100vh;
 }
 
+/* Style completed tasks */
+#tasks li.completed {
+  text-decoration: line-through; /* Cross out completed tasks */
+  color: #999; /* Grey out completed tasks */
+}
+
 #addTask {
   background-color: white;
   padding: 20px;

@@ -1,26 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>To-Do List</title>
     <link rel="stylesheet" type="text/css" href="todo.css">
 </head>
 <body>
-  <div id="homeScreen">
-    <div id="userProfile">
-        <img src="images/eren.jpg" alt="User Profile Picture" id="profilePic">
-        <h3 id="userName">Username</h3>
-        <!-- Additional user info can go here -->
-    </div>
-    <div id="taskList">
-        <h3>Today's Tasks</h3>
-        <ul id="tasks">
-            <!-- Tasks will be listed here -->
-        </ul>
-    </div>
-</div>
-<div id="taskDetails">
-    <!-- Task details will be displayed here -->
-</div>
+    <header>
+        <div id="userProfile">
+            <img src="images/eren.jpg" alt="User Profile Picture" id="profilePic">
+            <h3 id="userName">Username</h3>
+            <!-- Additional user info can go here -->
+        </div>
+    </header>
+
+    <main id="homeScreen">
+        <section id="taskList">
+            <h3>Today's Tasks</h3>
+            <ul id="tasks">
+                <li>
+                    <input type="checkbox" class="task-complete">
+                    <span class="task-name">Task Name</span>
+                    <span class="task-description">Task Description</span>
+                    <button class="delete-task">Delete</button>
+                </li>
+                <!-- More tasks... -->
+            </ul>
+        </section>
+    </main>
 
     <div id="addTask">
         <h2>Add Task</h2>
@@ -60,9 +66,7 @@
             <input type="submit" value="Add Task">
         </form>
     </div>
-    
-  
+
     <script src="todo.js"></script>
-    
 </body>
 </html>

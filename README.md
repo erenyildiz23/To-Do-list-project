@@ -1,62 +1,64 @@
 # To-Do List
 
-[Forjr](https://www.npmjs.com/package/forjr) ile yazılmış, çok kullanıcılı, Türkçe bir yapılacaklar uygulaması.
+**English** · [Türkçe](README.tr.md)
 
-- Kayıt olma, giriş ve çıkış (şifreler hash'lenerek saklanır, hatalı denemeler sınırlanır)
-- Görevler: öncelik, son tarih, açıklama, alt görevler ("adımlar"), proje ve etiketler
-- Filtreler (Hepsi / Aktif / Tamamlanan / projeye göre) ve ilerleme çubuğu
-- Her kullanıcı yalnızca kendi verisini görür ve değiştirebilir
-- Kişiselleştirme: tema (sistem / açık / koyu), vurgu rengi, yazı boyutu, yoğunluk, sıralama, tamamlananları gizleme. Ayarlar hesaba kaydedilir, her cihazda aynı gelir
-- Mobil uyumlu; renkler WCAG AA (4.5:1) kontrastını iki temada da geçer
+A multi-user to-do app built with [Forjr](https://www.npmjs.com/package/forjr). The interface is in Turkish.
 
-## Çalıştırma
+- Sign up, sign in and sign out (passwords are hashed, failed attempts are rate-limited)
+- Tasks with priority, due date, description, subtasks ("steps"), projects and tags
+- Filters (All / Active / Done / by project) and a progress bar
+- Every user sees and changes only their own data
+- Personalisation: theme (system / light / dark), accent color, text size, density, sort order, hide completed. Settings are stored on the account, so they follow the user to every device
+- Responsive; every text/background pair passes WCAG AA (4.5:1) contrast in both themes
 
-npm gerekir (Forjr kendi çalıştığı Node.js sürümünü getirir).
+## Running it
+
+You need npm (Forjr brings the Node.js version it runs on).
 
 ```bash
 npm install
 npx forjr dev --port 3000
 ```
 
-Ardından http://localhost:3000 adresini açıp `/sign-up` sayfasından bir hesap oluşturun.
+Then open http://localhost:3000 and create an account at `/sign-up`.
 
-| Komut | Ne yapar |
+| Command | What it does |
 |---|---|
-| `npx forjr dev` | Geliştirme sunucusu (dosya değişince yeniden yükler) |
-| `npx forjr check` | Bütün kuralları ve tip denetimini çalıştırır, her hatayı düzeltme önerisiyle yazar |
-| `npx forjr test` | `tests/` altındaki testleri çalıştırır; değişmeyen testleri yeniden oynatır (`--all` hepsini çalıştırır) |
-| `npx forjr build` | Üretim paketini `.forjr/build/` içine yazar |
-| `npx forjr map` | Uygulamanın kısa haritası: her tanım, kim çağırabilir, neyi okur/yazar |
+| `npx forjr dev` | Development server, reloads on file changes |
+| `npx forjr check` | Runs every rule and the type checker, prints each problem with its fix |
+| `npx forjr test` | Runs the tests in `tests/`; tests whose code and data did not change are replayed (`--all` runs every one) |
+| `npx forjr build` | Writes a production bundle to `.forjr/build/` |
+| `npx forjr map` | A short map of the app: each definition, who may call it, what it reads and writes |
 
-Veritabanı `.forjr/data.db` içinde durur ve depoya eklenmez.
+The database lives in `.forjr/data.db` and is not committed.
 
-## Proje yapısı
+## Project layout
 
 ```
-forjr.ts              Proje tanımı: başlık, giriş sayfası, dil
+forjr.ts              Project definition: title, sign-in page, language
 functions/
-  users.ts            users tablosu, kayıt (signUp)
-  signIn.ts           giriş
-  signOut.ts          çıkış
-  profile.ts          kendi profilini okuma, görünüm tercihleri, görünen ad
-  tasks.ts            görevler
-  subtasks.ts         alt görevler
-  projects.ts         projeler
-  tags.ts             etiketler ve görev-etiket bağları
+  users.ts            users table, sign-up (signUp)
+  signIn.ts           sign-in
+  signOut.ts          sign-out
+  profile.ts          reading your own profile, display preferences, display name
+  tasks.ts            tasks
+  subtasks.ts         subtasks
+  projects.ts         projects
+  tags.ts             tags and task-tag links
 screens/
-  home.tsx, home.css  ana ekran ve ayarlar paneli; tasarım token'ları home.css başında
+  home.tsx, home.css  main screen and settings panel; design tokens at the top of home.css
   signIn.tsx, signUp.tsx, auth.css
-messages/tr.ts        Türkçe form ve hata mesajları
-tests/                node:test ile yazılmış uygulama testleri
+messages/tr.ts        Turkish form and error messages
+tests/                app tests written with node:test
 ```
 
-## Forjr'ı nasıl kullandım
+## How I used Forjr
 
-Forjr'da uygulama, `export const ad = kelime('ad', { ... })` biçimindeki **tanımlardan** oluşur. Motor bu tanımları okur: veritabanını, API'yi, erişim denetimini ve sayfaları kendisi kurar. Aşağıda bu projede kullandığım parçalar ve neden öyle kullandığım var.
+A Forjr app is made of **definitions** of the form `export const name = word('name', { ... })`. The engine reads them and builds the database, the API, the access checks and the pages itself. Below are the pieces this project uses and why.
 
-### 1. Tablolar ve erişim kuralları
+### 1. Tables and access rules
 
-Her tablo kimin okuyup yazabileceğini kendisi söyler. Bir kural yazılmazsa `'nobody'` sayılır.
+Each table states who may read and write it. A rule that is left out means `'nobody'`.
 
 ```ts
 export const tasks = table('tasks', {
@@ -72,13 +74,13 @@ export const tasks = table('tasks', {
 })
 ```
 
-- `owner: 'ownerId'`: satırı ekleyen kullanıcı bu sütuna motor tarafından yazılır.
-- `read: 'owner'`: sorgular sadece çağıranın kendi satırlarını döndürür. Kullanıcılar arası ayrımı uygulama kodunda filtreyle değil, tablonun kuralıyla yaptım; böylece bir sorguyu unutmak veri sızdırmaz.
-- `onRemove`: bağlı satır silinince ne olacağı. Proje silinince görev projesiz kalır (`'clear'`), görev silinince alt görevleri ve etiket bağları da silinir (`'remove'`). Bu yazılmadan bağlı bir satır silinemiyordu; testler yakaladı.
+- `owner: 'ownerId'`: the engine fills this column with the user who adds the row.
+- `read: 'owner'`: queries only return the caller's own rows. User isolation lives in the table rule, not in a filter in app code, so forgetting a filter in some query cannot leak data.
+- `onRemove`: what happens when a linked row is removed. Removing a project leaves its tasks without a project (`'clear'`); removing a task also removes its subtasks and tag links (`'remove'`). Without this, linked rows could not be removed at all, which the tests caught.
 
-### 2. Sorgular ve değişiklikler
+### 2. Queries and changes
 
-Veri yalnızca bir `change` ile yazılır, `query` yalnızca okur. İkisi de bildirimsel (declarative) yazılır:
+Data is written only by a `change`; a `query` only reads. Both are declarative:
 
 ```ts
 export const activeTasks = query('activeTasks', {
@@ -93,29 +95,29 @@ export const savePreferences = change('savePreferences', {
 })
 ```
 
-`caller('id')` çağıran kullanıcıyı temsil eder; kullanıcı kendi kaydı dışında hiçbir satırı değiştiremez.
+`caller('id')` stands for the calling user, so a user can only ever change their own record.
 
-### 3. Girdiye bakan kurallar: `allow`
+### 3. Rules that look at the input: `allow`
 
-Başka birinin görevine alt görev ya da etiket eklenmesin diye, bağlanan satırın çağırana ait olduğunu kontrol ettim. `allow` kuralına verilen `db` çağıranın gözüyle okur, yani başkasının satırını görmez:
+To stop anyone from adding a subtask or a tag to someone else's task, I check that the linked row belongs to the caller. The `db` handed to `allow` reads as the caller, so it cannot see other users' rows:
 
 ```ts
 access: allow((user, input, db) => !!user && db.tasks.where({ id: input.taskId }).count() > 0),
 ```
 
-### 4. Giriş sistemi
+### 4. Authentication
 
-Forjr hazır bir giriş sistemi vermez; parçaları verir ve giriş, projenin kendi kodudur. `forjr docs topic.signIn` sayfasını izledim:
+Forjr has no built-in sign-in. It gives you the pieces, and the sign-in is the project's own code. I followed `forjr docs topic.signIn`:
 
-- `passwords.hash` / `passwords.check`: şifre düz metin olarak saklanmaz. `password` sütunu `private: true` olduğu için hiçbir sorgu onu döndürmez.
-- `attempts.limit`: bir e-posta için 10 dakikada 5'ten fazla hatalı deneme engellenir (hesap başına toplamda saatte 50).
-- `sessions.start(user.id)` / `sessions.end()`: tarayıcıya JavaScript'in okuyamadığı (`HttpOnly`, `SameSite=Lax`) bir oturum çerezi koyar.
-- Kayıt, `access: 'nobody'` olan bir `addUser` değişikliğine `call` ile ulaşır; dışarıdan kimse doğrudan kullanıcı yazamaz.
-- `project({ signInPath: '/sign-in' })`: giriş isteyen bir sayfaya gelen ziyaretçi oraya yönlendirilir.
+- `passwords.hash` / `passwords.check`: passwords are never stored in plain text. The `password` column is `private: true`, so no query ever returns it.
+- `attempts.limit`: more than 5 failed attempts for one email within 10 minutes are blocked (and at most 50 per hour per account overall).
+- `sessions.start(user.id)` / `sessions.end()`: sets a session cookie that scripts cannot read (`HttpOnly`, `SameSite=Lax`).
+- Sign-up reaches an `addUser` change whose access is `'nobody'` through `call`, so nothing from outside can write a user directly.
+- `project({ signInPath: '/sign-in' })`: a visitor who opens a page that needs a sign-in is sent there.
 
-### 5. Ekranlar
+### 5. Screens
 
-Bir `screen` React'tir. `data` ile sorguları okur; `Form` ve `useCall` ile değişiklikleri çağırır:
+A `screen` is React. It reads queries through `data` and calls changes with `Form` and `useCall`:
 
 ```tsx
 export const homeScreen = screen('homeScreen', {
@@ -128,17 +130,17 @@ export const homeScreen = screen('homeScreen', {
 })
 ```
 
-- `Form`, girdileri tanımdaki tiplere göre hem tarayıcıda hem sunucuda denetler.
-- `useCall(fn, { optimistic })` ile alt görevi işaretlemek gibi işler sunucuyu beklemeden ekranda görünür.
-- Stiller düz CSS. Bütün renkler `home.css` başında CSS değişkeni (token). Açık/koyu tema için CSS'in `light-dark()` fonksiyonunu kullandım; "Sistem" seçeneği ek kod gerektirmeden bilgisayarın temasını takip eder.
+- `Form` validates inputs against the definition's types, both in the browser and on the server.
+- `useCall(fn, { optimistic })` makes actions such as ticking a subtask show up immediately, without waiting for the server.
+- Styling is plain CSS. Every color is a CSS custom property (token) at the top of `home.css`. Light and dark themes use CSS `light-dark()`, so the "System" option follows the device theme with no extra code.
 
-### 6. Dil
+### 6. Language
 
-`project({ languages: ['tr'] })` ve `messages/tr.ts` ile hem form doğrulama mesajları (`forjr.required`, `forjr.min` …) hem de uygulamanın kendi hata kodları (`fail.wrong-sign-in`, motorun deneme sınırı için `fail.F0005`) Türkçe gösterilir.
+With `project({ languages: ['tr'] })` and `messages/tr.ts`, both the built-in form validation messages (`forjr.required`, `forjr.min`, …) and the app's own error codes (`fail.wrong-sign-in`, and `fail.F0005` for the engine's rate limit) are shown in Turkish.
 
-### 7. Testler
+### 7. Tests
 
-`forjr/test` her test için boş bir veritabanıyla uygulamanın ayrı bir kopyasını açar:
+`forjr/test` opens a separate copy of the app on an empty database for each test:
 
 ```ts
 const app = await testApp()
@@ -147,12 +149,18 @@ await app.as(ali).call('addTask', { title: 'Alinin gorevi', priority: 'high' })
 await assert.rejects(app.as(ayse).call('removeTask', { id: aliTask.id }))
 ```
 
-Testler şunları doğruluyor: kayıt ve giriş (çerez gerçekten geliyor mu, şifre hash'leniyor mu, yanlış şifre ve şifresiz eski hesap reddediliyor mu), kullanıcı izolasyonu (okuma, değiştirme, silme ve başkasının satırına bağlama), silme davranışları ve tercihlerin kaydı. `forjr check`, hiçbir testin dokunmadığı tanımları ayrıca uyarı olarak listeler.
+The tests cover:
+- **Sign-up and sign-in:** the cookie is really set, the password is hashed, and a wrong password or an old account without a password is refused.
+- **User isolation:** reading, changing, removing, and linking to another user's rows.
+- **Removal:** what happens to linked rows.
+- **Preferences:** they are saved, and only for that user.
 
-### Yolda öğrendiklerim
+`forjr check` also warns about every definition that no test touched.
 
-- **Her değişiklikten sonra `forjr check`.** Bütün hataları bir kerede, her birinin düzeltmesiyle verir. `forjr docs <kod>` o hatayı açıklar.
-- **Bir `run` gövdesi Forjr'ın kendi kelimeleriyle sınırlıdır.** Bir okumanın sonucunda metot çağırmak (`.trim()` gibi) bazı yerlerde `F0013` verir.
-- **`/_f/call/<ad>` çağrısının gövdesi `{ "input": { ... } }` biçimindedir**, girdiler doğrudan gövdeye yazılmaz.
-- **Geliştirme sunucusunda karşılaştığım bir hata:** İki ekran aynı fonksiyon dosyasından farklı tanımlar alınca, sıcak yeniden yüklemeden sonra tarayıcı paketi bazen birinin export'unu kaybediyordu ("does not provide an export named …"). Üretim derlemesinde (`forjr build`) bu olmuyor. Çözüm olarak, ekranların kullandığı fonksiyonları ayrı dosyalara böldüm (`signIn.ts` / `signOut.ts`, `users.ts` / `profile.ts`).
-- **Sabit renk yerine token.** Kişiselleştirme (tema, vurgu rengi, yoğunluk) ancak bütün renkler değişkenlere taşındıktan sonra mümkün oldu.
+### Lessons learned
+
+- **Run `forjr check` after every change.** It reports every problem at once, each with its fix; `forjr docs <code>` explains a code.
+- **A `run` body is limited to Forjr's own words.** Calling a method on the result of a read (such as `.trim()`) can raise `F0013`.
+- **The body of a `/_f/call/<name>` request is `{ "input": { ... } }`.** Inputs do not go at the top level.
+- **A dev-server issue I hit:** when two screens imported different definitions from the same functions file, the browser bundle sometimes lost one of the exports after a hot reload ("does not provide an export named …"). Production builds (`forjr build`) are not affected. As a workaround, I split the functions that screens use into separate files (`signIn.ts` / `signOut.ts`, `users.ts` / `profile.ts`).
+- **Tokens, not hard-coded colors.** Personalisation (theme, accent color, density) only became possible once every color was moved into variables.
